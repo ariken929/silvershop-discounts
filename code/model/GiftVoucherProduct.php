@@ -151,7 +151,10 @@ class GiftVoucher_OrderItem extends Product_OrderItem{
             "MinOrderValue" => $this->UnitPrice,
             "StartDate" => $nowString,
             "EndDate" => date('Y-m-d H:i:s', strtotime('+1 year', strtotime($nowString))),
-            "StoreID" => $this->Order()->StoreID
+            "StoreID" => $this->Order()->StoreID,
+			"ForItems" => 0,
+			"ForCart" => 1,
+			"ForShipping" => 0
         ));
 
         $this->extend("updateCreateCoupon", $coupon);
