@@ -136,22 +136,30 @@ class GiftVoucher_OrderItem extends Product_OrderItem{
 	 * Create a new coupon, based on this orderitem
 	 * @return OrderCoupon
 	 */
-	public function createCoupon() {
-		if(!$this->Product()){
-			return false;
-		}
-		$coupon = new OrderCoupon(array(
-			"Title" => $this->Product()->Title,
-			"Type" => "Amount",
-			"Amount" => $this->UnitPrice,
-			"UseLimit" => 1,
-			"MinOrderValue" => $this->UnitPrice //safeguard that means coupons must be used entirely
-		));
-		$this->extend("updateCreateCupon", $coupon);
-		$coupon->write();
-		$this->Coupons()->add($coupon);
-		return $coupon;
-	}
+    public function createCoupon() {
+        if (!$this->Product()) {
+            return false;
+        }
+        $now = SS_Datetime::now();
+        $nowString = $now->format('Y-m-d H:i:s');
+
+        $coupon = OrderCoupon::create(array(
+            "Title" => $this->Product()->Title,
+            "Type" => "Amount",
+            "Amount" => $this->UnitPrice,
+            "UseLimit" => 1,
+            "MinOrderValue" => $this->UnitPrice,
+            "StartDate" => $nowString,
+            "EndDate" => date('Y-m-d H:i:s', strtotime('+1 year', strtotime($nowString))),
+            "StoreID" => $this->Order()->StoreID
+        ));
+
+        $this->extend("updateCreateCoupon", $coupon);
+        $coupon->write();
+
+        $this->Coupons()->add($coupon);
+        return $coupon;
+    }
 
 	/*
 	 * Send the voucher to the appropriate email
